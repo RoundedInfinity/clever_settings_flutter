@@ -1,0 +1,20 @@
+name: clever_settings_flutter
+description: A flutter package that provides useful flutter utilities for clever_settings.
+version: 0.1.0+1
+
+environment:
+  sdk: ">=2.18.0 <3.0.0"
+  flutter: 3.3.0
+
+dependencies:
+  clever_settings: ^0.1.0+1
+  flutter:
+    sdk: flutter
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  mocktail: ^0.3.0
+  very_good_analysis: ^4.0.0+1
