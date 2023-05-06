@@ -21,8 +21,8 @@ class App extends StatelessWidget {
 }
 
 class Settings {
-  static const mySetting =
-      SettingsValue<bool>(name: 'mySetting', defaultValue: true);
+  static final mySetting =
+      DefaultSettingsValue<bool>(name: 'mySetting', defaultValue: true);
 }
 
 class HomePage extends StatelessWidget {
@@ -40,7 +40,12 @@ class HomePage extends StatelessWidget {
               return Text(value.toString());
             },
           ),
-          const SettingsSwitch(setting: Settings.mySetting)
+          FilledButton(
+            onPressed: () {
+              Settings.mySetting.value = !Settings.mySetting.value;
+            },
+            child: const Text('Change setting'),
+          ),
         ],
       ),
     );

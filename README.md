@@ -8,14 +8,12 @@ A flutter package that provides useful flutter utilities for [clever_settings](h
 
 ## Installation 💻
 
-**❗ In order to start using Clever Settings Flutter you must have the [Flutter SDK][flutter_install_link] installed on your machine.**
-
 Add `clever_settings_flutter` and `clever_settings` to your `pubspec.yaml`:
 
 ```yaml
-dependencies:
-  clever_settings:
-  clever_settings_flutter:
+dependencies: 
+  clever_settings: ^[version]
+  clever_settings_flutter: ^[version]
 ```
 
 Install it:
@@ -26,7 +24,7 @@ flutter packages get
 
 ---
 
-## Initialization
+## Initialization 🚀
 
 Before you can start using Clever Settings, you need to initialize it first. Call the init function once at the start of your application:
 
@@ -37,7 +35,7 @@ await CleverSettingsFlutter.init();
 This will initialize [Hive](https://pub.dev/packages/hive) and open the settings database.
 If you want to configure Hive yourself, you can use `CleverSettings.open()` after initializing Hive.
 
-## Usage 🚀
+## Usage 💡
 
 > This will only focus on the additional features of `clever_settings_flutter`. The readme for the basic usage of `clever_settings` can be found [here](https://pub.dev/packages/clever_settings).
 
@@ -45,7 +43,7 @@ If you want to configure Hive yourself, you can use `CleverSettings.open()` afte
 
 The `SettingsValueBuilder` is a widget used for building other widgets that depend on a `SettingsValue` object. It rebuilds whenever the value of the setting changes.
 
-Example usage:
+Example:
 
 ```dart
 class Settings {
@@ -63,7 +61,26 @@ SettingsValueBuilder(
 ),
 ```
 
-[flutter_install_link]: https://docs.flutter.dev/get-started/install
+### MultiSettingsValueBuilder
+
+The `MultiSettingsValueBuilder` is a widget that allows you to listen to and combine multiple `SettingsValue` objects to build a widget that depends on all of them.
+
+Example:
+
+```dart
+MultiSettingsValueBuilder(
+  settings: [
+    Settings.mySetting,
+    Settings.myOtherSetting,
+  ],
+  builder: (context, child) {
+    // Updates when one of the settings changes.
+    return Text('${Settings.mySetting.value} ${Settings.myOtherSetting.value}');
+  },
+)
+
+```
+
 [license_badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [license_link]: https://opensource.org/licenses/MIT
 [very_good_analysis_badge]: https://img.shields.io/badge/style-very_good_analysis-B22C89.svg

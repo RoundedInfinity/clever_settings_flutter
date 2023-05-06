@@ -53,38 +53,73 @@ class SettingsValueBuilder<T> extends StatelessWidget {
   }
 }
 
-/// {@template settings_switch}
-/// A [Switch.adaptive] that is driven by a settings value.
+/// {@template multi_settings_value_builder}
+/// The [MultiSettingsValueBuilder] is a widget used for building widgets that depend on multiple [SettingsValue] objects.
 ///
-/// The [setting] must be of type `bool` and cannot be `null`.
+/// It rebuilds when the value of any of the [settings] change.
+///
+/// See also:
+/// - [ValueListenableBuilder]
+/// - [SettingsValue]
 /// {@endtemplate}
-class SettingsSwitch extends StatelessWidget {
-  /// {@macro settings_switch}
-  const SettingsSwitch({
-    required this.setting,
+class MultiSettingsValueBuilder<T> extends StatelessWidget {
+  /// Creates a [MultiSettingsValueBuilder] widget.
+  ///
+  /// {@macro multi_settings_value_builder}
+  const MultiSettingsValueBuilder({
+    required this.settings,
+    required this.builder,
+    this.child,
     super.key,
   });
 
-  /// The [SettingsValue] used to control this switch.
-  final SettingsValue<bool> setting;
+  /// A list of [SettingsValue] objects that this widget listens to.
+  final List<SettingsValue<T>> settings;
+
+  /// A builder which builds its widget depending on the values of all [settings].
+  final Widget Function(BuildContext context, Widget? child) builder;
+
+  /// A [ValueListenable]-independent widget which is passed back to the [builder].
+  ///
+  /// See also:
+  /// - [ValueListenableBuilder.child]
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
-    return SettingsValueBuilder(
-      setting: setting,
-      builder: (context, value, child) {
-        assert(
-          value != null,
-          '${setting.name} must have a value for the switch to work. Consider setting a defaultValue.',
-        );
-
-        return Switch.adaptive(
-          value: setting.value!,
-          onChanged: (value) {
-            setting.value = value;
-          },
-        );
-      },
+    return ValueListenableBuilder<List<T?>>(
+      valueListenable: _combineValueListenables(),
+      builder: (context, value, child) => builder(context, child),
+      child: child,
     );
+  }
+
+  /// Combines the [ValueListenable] objects of all [settings] into a single [ValueListenable].
+  ValueListenable<List<T?>> _combineValueListenables() {
+    final listenables =
+        settings.map((setting) => setting.asListenable()).toList();
+    return _CombinedValueListenable(listenables);
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(IterableProperty<SettingsValue<T>>('settings', settings));
+  }
+}
+
+/// A [ValueNotifier] that combines the values of multiple [ValueListenable] objects into a single list.
+class _CombinedValueListenable<T> extends ValueNotifier<List<T?>> {
+  _CombinedValueListenable(List<ValueListenable<T?>> listenables)
+      : super(List.filled(listenables.length, null)) {
+    // ignore: prefer_asserts_with_message
+    assert(listenables.length == value.length);
+
+    // Register a listener that updates the value of this [_CombinedValueListenable]
+    // with the current values of all [ValueListenable] objects in [listenables].
+    Listenable.merge(listenables).addListener(() {
+      value = listenables.map((listenable) => listenable.value).toList();
+      notifyListeners();
+    });
   }
 }
